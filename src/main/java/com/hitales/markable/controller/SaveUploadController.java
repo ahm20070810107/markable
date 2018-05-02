@@ -52,8 +52,9 @@ public class SaveUploadController {
 
         uploadFileService.saveFile(multipartFile,savedFileName);
 
+        uploadFileService.checkFileExists(uploadFileName);
 
-
+        uploadFileService.saveExcelToMongo(savedFileName,uploadFileName);
     }
 
 

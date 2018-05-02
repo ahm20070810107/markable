@@ -14,13 +14,10 @@ public class ExcelTools {
 
         File excelFile = new File(excelPath);
         if(!excelFile.exists() || excelFile.isDirectory()){
-         //   log.info("文件 "+excelPath+" 不存在!");
             return null;
         }else if(!excelPath.endsWith(".xlsx") && !excelPath.endsWith(".xls")){
-        //    Log.i("文件 "+excelPath+" 不是excel文件!");
             return null;
         }
-
         Workbook workbook;
         try{
           //  workbook = WorkbookFactory.create(excelFile);

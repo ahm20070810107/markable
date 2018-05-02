@@ -12,5 +12,5 @@ public class ColumnAttr {
 
     private String fileName;
 
-    private List<ColumnAttrItem> columnLIst;
+    private List<ColumnAttrItem> columnList;
 }
