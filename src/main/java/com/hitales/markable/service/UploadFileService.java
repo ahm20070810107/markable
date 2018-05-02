@@ -92,25 +92,40 @@ public class UploadFileService {
     private void dealSheet(Sheet sheet,String fileName) {
         Iterator<Row> rows = sheet.rowIterator();
         Row row0 = rows.next();
-        Row row1 = rows.next();
 
+        Row row1 = rows.next();
         int startNum = row1.getFirstCellNum() + 1;//第一列不使用
         int endNum = row1.getLastCellNum();
 
+        saveColumnData(fileName,row0,row1,startNum,endNum);
+
         int count=1;
+        List<Document> listDoc= new ArrayList<>();
         while (rows.hasNext()) {
             count++;
-            Row row = rows.next();
-
+            getDataObject(listDoc,fileName,row1,rows.next(),startNum,endNum);
+            if(listDoc.size() == 100){
+                mongoTemplate.insert(listDoc,"fileData");
+                listDoc = new ArrayList<>();
+            }
         }
-        saveColumnData(fileName,row0,row1,startNum,endNum);
+        if(listDoc.size() > 0){
+            mongoTemplate.insert(listDoc,"fileData");
+        }
         saveFileNameList(fileName,count);
     }
 
-    private void getDataObject(Row columnNameRow,Row dataRow,int start,int end)
+    private void getDataObject(List<Document> listDoc,String fileName,Row columnNameRow,Row dataRow,int start,int end)
     {
-        for (int i = start; i < end; i++) {
+        Document document = new Document();
+        Document docDatas = new Document();
+        listDoc.add(document);
 
+        document.put("fileName",fileName);
+        document.put("datas",docDatas);
+        for (int i = start; i < end; i++) {
+            String key = ExcelTools.getCellValue(columnNameRow.getCell(i)).toString();
+            docDatas.put(key,ExcelTools.getCellValue(dataRow.getCell(i)));
         }
     }
     private void saveColumnData(String fileName,Row defineRow,Row columnNameRow,int start,int end){
@@ -120,10 +135,43 @@ public class UploadFileService {
         document.put("columnList",listAttr);
 
         for (int i = start; i < end; i++) {
-
+           Document document1 = new Document();
+           List<String> options= new ArrayList<>();
+           if(ExcelTools.getCellValue(columnNameRow.getCell(i)).toString().length() < 1) {
+               throw new NotAcceptableException(String.format("Excel的第%d列名为空，无法保存！",i+1));
+           }
+           document1.put("name",ExcelTools.getCellValue(columnNameRow.getCell(i)));
+           document1.put("type",getColumnType(ExcelTools.getCellValue(defineRow.getCell(i)).toString(),options));
+           document1.put("options",options);
         }
         mongoTemplate.save(document,"columnAttr");
     }
+
+    private int getColumnType(String cellValue,List<String> options){
+       int type = 1; //1表示输入框
+       cellValue = cellValue.trim();
+       if(cellValue.length() == 0 || cellValue.equals("不可修改")) {
+           return 0;//表示不可编辑
+       }
+       if(cellValue.startsWith("(")){
+           type =2 ;  //表示下拉单选
+           cellValue= cellValue.replaceAll("(|)","");
+           fillOptions(cellValue,options);
+       }else if(cellValue.startsWith("[")){
+           type =3; //表示下拉多选
+           cellValue = cellValue.replaceAll("[|]","");
+           fillOptions(cellValue,options);
+       }
+       return type;
+    }
+
+    private void fillOptions(String cellValue, List<String> options){
+        String[] values= cellValue.split(",");
+        for(String str :values){
+            options.add(str);
+        }
+    }
+
     private void saveFileNameList(String fileName,int count){
         Document document = new Document();
 

@@ -2,9 +2,17 @@ package com.hitales.markable.SocketHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.hitales.markable.model.FileData;
+import com.hitales.markable.util.CommonTools;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -18,20 +26,21 @@ import org.springframework.web.socket.WebSocketSession;
  *
  */
 @Service
+@Slf4j
 public class SocketHandler implements WebSocketHandler{
 
-    private static final Logger logger;
     private static final ArrayList<WebSocketSession> users;
 
     static{
         users = new ArrayList<>();
-        logger = LoggerFactory.getLogger(SocketHandler.class);
     }
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session)
             throws Exception {
-        logger.info("成功建立socket连接");
+        log.info("成功建立socket连接");
         users.add(session);
         String username = session.getAttributes().get("user").toString();
         if(username!=null){
@@ -43,7 +52,21 @@ public class SocketHandler implements WebSocketHandler{
     @Override
     public void handleMessage(WebSocketSession arg0, WebSocketMessage<?> arg1) {
         // TODO Auto-generated method stub
-        logger.info(arg0.getAttributes().get("user")+"的message："+arg1.getPayload());
+        //log.info(arg0.getAttributes().get("user")+"的message："+arg1.getPayload());
+        Document document = (Document) arg1.getPayload();
+        if(document != null) {
+            FileData fileData = new FileData();
+            fileData.setId(CommonTools.getJSonValue(document,"id"));
+            fileData.setFileName(CommonTools.getJSonValue(document,"fileName"));
+            document.remove("id");
+            document.remove("fileName");
+            Map<String,Object> mapValues= new HashMap<>();
+            for(Document.Entry<String,Object> doc :document.entrySet()){
+                mapValues.put(doc.getKey(),doc.getValue());
+            }
+            fileData.setDatas(mapValues);
+            mongoTemplate.save(fileData,"fileData");
+        }
     }
 
     @Override
@@ -52,13 +75,13 @@ public class SocketHandler implements WebSocketHandler{
         if(session.isOpen()){
             session.close();
         }
-        logger.error("连接出现错误:"+error.toString());
+        log.error("连接出现错误:"+error.toString());
         users.remove(session);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus arg1) {
-        logger.info("连接已关闭");
+        log.info("连接已关闭");
         users.remove(session);
     }
 
