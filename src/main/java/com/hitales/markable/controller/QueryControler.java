@@ -22,16 +22,16 @@ public class QueryControler {
 
 
     @GetMapping("/getList")
-    public QueryListRes getList(@RequestParam("fileName") String fileName, @RequestParam(name="page",required = false) int page, @RequestParam(name="pageSize",required =false) int pageSize){
+    public QueryListRes getList(@RequestParam("filename") String filename, @RequestParam(name="page",required = false) int page, @RequestParam(name="pageSize",required =false) int pageSize){
         log.info("getList start");
-        if(StringUtils.isEmpty(fileName)){
+        if(StringUtils.isEmpty(filename)){
             throw new BadRequestException("fileName 为空");
         }
         if(pageSize==0){
             log.info("pageSize 默认10条");
             pageSize=10;
         }
-        return queryService.getList(fileName,page,pageSize);
+        return queryService.getList(filename,page,pageSize);
     }
 
     @GetMapping("/getFileList")
