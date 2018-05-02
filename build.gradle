@@ -3,6 +3,7 @@ buildscript {
 		springBootVersion = '2.0.1.RELEASE'
 	}
 	repositories {
+		maven { url 'http://maven.aliyun.com/mvn/repository/' }
 		mavenCentral()
 	}
 	dependencies {
@@ -31,7 +32,13 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web-services')
 	compile('org.springframework.boot:spring-boot-starter-websocket')
 	compile('org.springframework.session:spring-session-core')
+	compile('org.apache.poi:poi:3.14')
+	compile('org.apache.poi:poi-ooxml:3.14')
+	compile('com.monitorjbl:xlsx-streamer:1.0.2')
+	compile('org.modelmapper:modelmapper:0.7.5')
 	runtime('org.springframework.boot:spring-boot-devtools')
+	compile('io.springfox:springfox-swagger2:2.7.0')
+	compile('io.springfox:springfox-swagger-ui:2.7.0')
 	compileOnly('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
