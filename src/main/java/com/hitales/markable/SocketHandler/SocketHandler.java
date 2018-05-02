@@ -58,7 +58,7 @@ public class SocketHandler implements WebSocketHandler{
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus arg1) {
-        logger.debug("连接已关闭");
+        logger.info("连接已关闭");
         users.remove(session);
     }
 
