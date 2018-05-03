@@ -33,9 +33,9 @@ public class QueryService {
 
     public QueryListRes getList( String fileName, int page, int pageSize){
         QueryListRes queryListRes = new QueryListRes();
-        List<ColumnAttr> columnAttrList = columnAttrRepository.findByFileName(fileName);
-        if(columnAttrList!=null&&columnAttrList.size()>0){
-            queryListRes.setTitles(columnAttrList.get(0).getColumnList());
+        ColumnAttr columnAttr = columnAttrRepository.findByFileName(fileName);
+        if(columnAttr!=null){
+            queryListRes.setTitles(columnAttr.getColumnList());
             PageRequest pageRequest = PageRequest.of(page,pageSize);
             Page<FileData> fileDataPage = fileDataRepository.findByFileName(fileName,pageRequest);
             if(fileDataPage.hasContent()){
