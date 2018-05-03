@@ -32,14 +32,23 @@ public class WebSocketInterceptor implements HandshakeInterceptor{
                                    ServerHttpResponse response, WebSocketHandler handler,
                                    Map<String, Object> map){
         if(request instanceof ServletServerHttpRequest){
-//            ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
-//            HttpSession session = servletRequest.getServletRequest().getSession();
-//            String path= servletRequest.getURI().getQuery();
-//
-//            if(session!=null){
-//                //区分socket连接以定向发送消息
-//                //     session.setAttribute("user",path);
-//                map.put("user", path);
+            ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
+            HttpSession session = servletRequest.getServletRequest().getSession();
+            String path= servletRequest.getURI().getQuery();
+            if(path == null){
+                path="123";
+            }
+            if(session!=null){
+                //区分socket连接以定向发送消息
+                //     session.setAttribute("user",path);
+                map.put("user", path);
+            }
+//            if (session != null) {
+//                String userName = (String) session.getAttribute(Constants.SESSION_USERNAME);
+//                if(userName == null){
+//                    userName = "WEBSOCKET_USERNAME_IS_NULL";
+//                }
+//                map.put(Constants.WEBSOCKET_USERNAME,userName);
 //            }
 
         }
