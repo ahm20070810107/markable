@@ -27,9 +27,9 @@ repositories {
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
-	compile('org.springframework.boot:spring-boot-starter-quartz')
+//	compile('org.springframework.boot:spring-boot-starter-quartz')
 	compile('org.springframework.boot:spring-boot-starter-web')
-	compile('org.springframework.boot:spring-boot-starter-web-services')
+//	compile('org.springframework.boot:spring-boot-starter-web-services')
 	compile('org.springframework.boot:spring-boot-starter-websocket')
 	compile('org.springframework.session:spring-session-core')
 	compile('org.apache.poi:poi:3.14')
