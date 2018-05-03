@@ -7,4 +7,6 @@ package com.hitales.markable.common;
  * Time:上午9:56
  */
 public class Constant {
+
+    public static final String MUTI_INPUT_SPLIT_CHAR = ",";
 }
