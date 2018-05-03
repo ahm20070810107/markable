@@ -1,6 +1,7 @@
 package com.hitales.markable.service;
 
 import com.hitales.markable.Exception.NotAcceptableException;
+import com.hitales.markable.common.Constant;
 import com.hitales.markable.model.FileNameList;
 import com.hitales.markable.util.ExcelTools;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA
@@ -97,13 +96,14 @@ public class UploadFileService {
         int startNum = row1.getFirstCellNum() + 1;//第一列不使用
         int endNum = row1.getLastCellNum();
 
-        saveColumnData(fileName,row0,row1,startNum,endNum);
+        Set<String> setMultiColumn = new HashSet<>();    //存多选的列名
+        saveColumnData(setMultiColumn,fileName,row0,row1,startNum,endNum);
 
         int count=1;
         List<Document> listDoc= new ArrayList<>();
         while (rows.hasNext()) {
             count++;
-            getDataObject(listDoc,fileName,row1,rows.next(),startNum,endNum);
+            getDataObject(setMultiColumn,listDoc,fileName,row1,rows.next(),startNum,endNum);
             if(listDoc.size() == 100){
                 mongoTemplate.insert(listDoc,"fileData");
                 listDoc = new ArrayList<>();
@@ -115,7 +115,7 @@ public class UploadFileService {
         saveFileNameList(fileName,count);
     }
 
-    private void getDataObject(List<Document> listDoc,String fileName,Row columnNameRow,Row dataRow,int start,int end)
+    private void getDataObject(Set<String> setMultiColumn,List<Document> listDoc,String fileName,Row columnNameRow,Row dataRow,int start,int end)
     {
         Document document = new Document();
         Document docDatas = new Document();
@@ -125,10 +125,17 @@ public class UploadFileService {
         document.put("datas",docDatas);
         for (int i = start; i < end; i++) {
             String key = ExcelTools.getCellValue(columnNameRow.getCell(i)).toString();
+            if(setMultiColumn.contains(key)){
+               String value=ExcelTools.getCellValue(dataRow.getCell(i)).toString();
+               value = value.replace(Constant.USER_INPUT_SPLIT_CHAR,Constant.MUTI_INPUT_SPLIT_CHAR);
+               List<String> values= Arrays.asList(value.split(Constant.MUTI_INPUT_SPLIT_CHAR));
+               docDatas.put(key,values);
+            }else{
             docDatas.put(key,ExcelTools.getCellValue(dataRow.getCell(i)));
+            }
         }
     }
-    private void saveColumnData(String fileName,Row defineRow,Row columnNameRow,int start,int end){
+    private void saveColumnData(Set<String> setMultiColumn,String fileName,Row defineRow,Row columnNameRow,int start,int end){
         Document document = new Document();
         List<Document> listAttr= new ArrayList<>();
         document.put("fileName",fileName);
@@ -136,18 +143,20 @@ public class UploadFileService {
 
         for (int i = start; i < end; i++) {
            Document document1 = new Document();
+           listAttr.add(document1);
            List<String> options= new ArrayList<>();
            if(ExcelTools.getCellValue(columnNameRow.getCell(i)).toString().length() < 1) {
                throw new NotAcceptableException(String.format("Excel的第%d列名为空，无法保存！",i+1));
            }
-           document1.put("name",ExcelTools.getCellValue(columnNameRow.getCell(i)));
-           document1.put("type",getColumnType(ExcelTools.getCellValue(defineRow.getCell(i)).toString(),options));
+           String columnName=ExcelTools.getCellValue(columnNameRow.getCell(i)).toString();
+           document1.put("name",columnName);
+           document1.put("type",getColumnType(setMultiColumn,columnName,ExcelTools.getCellValue(defineRow.getCell(i)).toString(),options));
            document1.put("options",options);
         }
         mongoTemplate.save(document,"columnAttr");
     }
 
-    private int getColumnType(String cellValue,List<String> options){
+    private int getColumnType(Set<String> setMultiColumn,String columnName,String cellValue,List<String> options){
        int type = 1; //1表示输入框
        cellValue = cellValue.trim();
        if(cellValue.length() == 0 || cellValue.equals("不可修改")) {
@@ -159,6 +168,7 @@ public class UploadFileService {
            fillOptions(cellValue,options);
        }else if(cellValue.startsWith("[")){
            type =3; //表示下拉多选
+           setMultiColumn.add(columnName);
            cellValue = cellValue.replaceAll("[|]","");
            fillOptions(cellValue,options);
        }
