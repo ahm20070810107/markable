@@ -167,12 +167,12 @@ public class UploadFileService {
        }
        if(cellValue.startsWith("(")){
            type =2 ;  //表示下拉单选
-           cellValue= cellValue.replaceAll("(|)","");
+           cellValue= cellValue.replaceAll("\\(|\\)","").replaceAll("（|）","");
            fillOptions(cellValue,options);
        }else if(cellValue.startsWith("[")){
            type =3; //表示下拉多选
            setMultiColumn.add(columnName);
-           cellValue = cellValue.replaceAll("[|]","");
+           cellValue = cellValue.replaceAll("\\[|\\]","").replaceAll("【|】","");
            fillOptions(cellValue,options);
        }
        return type;

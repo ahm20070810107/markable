@@ -1,7 +1,6 @@
 package com.hitales.markable.model;
 
 import lombok.Data;
-import org.omg.CORBA.Object;
 
 import java.util.Map;
 
