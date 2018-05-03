@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @RestController
 @Slf4j
 @RequestMapping(value = "/upload")
-public class SaveUploadController {
+public class UploadController {
 
     @Autowired
     private UploadFileService uploadFileService;
