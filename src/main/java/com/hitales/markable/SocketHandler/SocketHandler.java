@@ -29,23 +29,22 @@ import org.springframework.web.socket.WebSocketSession;
 @Slf4j
 public class SocketHandler implements WebSocketHandler{
 
-    private static final ArrayList<WebSocketSession> users;
-
-    static{
-        users = new ArrayList<>();
-    }
+//    private static final ArrayList<WebSocketSession> users;
+//
+//    static{
+//        users = new ArrayList<>();
+//    }
     @Autowired
     private MongoTemplate mongoTemplate;
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session)
-            throws Exception {
+    public void afterConnectionEstablished(WebSocketSession session) {
         log.info("成功建立socket连接");
-        users.add(session);
-        String username = session.getAttributes().get("user").toString();
-        if(username!=null){
-            session.sendMessage(new TextMessage("我们已经成功建立socket通信了"));
-        }
+//        users.add(session);
+//        String username = session.getAttributes().get("user").toString();
+//        if(username!=null){
+//            session.sendMessage(new TextMessage("我们已经成功建立socket通信了"));
+//        }
 
     }
 
@@ -76,13 +75,13 @@ public class SocketHandler implements WebSocketHandler{
             session.close();
         }
         log.error("连接出现错误:"+error.toString());
-        users.remove(session);
+//        users.remove(session);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus arg1) {
         log.info("连接已关闭");
-        users.remove(session);
+//        users.remove(session);
     }
 
     @Override
@@ -90,42 +89,42 @@ public class SocketHandler implements WebSocketHandler{
         return false;
     }
 
-    /**
-     * 给所有在线用户发送消息
-     *
-     * @param message
-     */
-    public void sendMessageToUsers(TextMessage message) {
-        for (WebSocketSession user : users) {
-            try {
-                if (user.isOpen()) {
-                    user.sendMessage(message);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    /**
+//     * 给所有在线用户发送消息
+//     *
+//     * @param message
+//     */
+//    public void sendMessageToUsers(TextMessage message) {
+//        for (WebSocketSession user : users) {
+//            try {
+//                if (user.isOpen()) {
+//                    user.sendMessage(message);
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
-    /**
-     * 给某个用户发送消息
-     *
-     * @param userName
-     * @param message
-     */
-    public void sendMessageToUser(String userName, TextMessage message) {
-        for (WebSocketSession user : users) {
-            if (user.getAttributes().get("user").equals(userName)) {
-                try {
-                    if (user.isOpen()) {
-                        user.sendMessage(message);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-            }
-        }
-    }
+//    /**
+//     * 给某个用户发送消息
+//     *
+//     * @param userName
+//     * @param message
+//     */
+//    public void sendMessageToUser(String userName, TextMessage message) {
+//        for (WebSocketSession user : users) {
+//            if (user.getAttributes().get("user").equals(userName)) {
+//                try {
+//                    if (user.isOpen()) {
+//                        user.sendMessage(message);
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                break;
+//            }
+//        }
+//    }
 
 }

@@ -69,7 +69,7 @@ public class UploadFileService {
         if (!destFile.getParentFile().exists()) {
             destFile.getParentFile().mkdirs();// 新建文件夹
         }
-        multipartFile.transferTo(destFile);
+        multipartFile.transferTo(destFile.getAbsoluteFile());
       }  catch (Exception e) {
         throw new NotAcceptableException("保存上传文件失败！");
       }
@@ -126,7 +126,12 @@ public class UploadFileService {
             if(setMultiColumn.contains(key)){
                String value=ExcelTools.getCellValue(dataRow.getCell(i)).toString();
                value = value.replace(Constant.USER_INPUT_SPLIT_CHAR,Constant.MUTI_INPUT_SPLIT_CHAR);
-               List<String> values= Arrays.asList(value.split(Constant.MUTI_INPUT_SPLIT_CHAR));
+                List<String> values;
+               if(value.length() == 0){
+                  values = new ArrayList<>();
+               }else{
+                values= Arrays.asList(value.split(Constant.MUTI_INPUT_SPLIT_CHAR));
+               }
                docDatas.put(key,values);
             }else{
             docDatas.put(key,ExcelTools.getCellValue(dataRow.getCell(i)));
@@ -157,7 +162,7 @@ public class UploadFileService {
     private int getColumnType(Set<String> setMultiColumn,String columnName,String cellValue,List<String> options){
        int type = 1; //1表示输入框
        cellValue = cellValue.trim();
-       if(cellValue.length() == 0 || cellValue.equals("不可修改")) {
+       if(cellValue.equals("不可修改")) {
            return 0;//表示不可编辑
        }
        if(cellValue.startsWith("(")){

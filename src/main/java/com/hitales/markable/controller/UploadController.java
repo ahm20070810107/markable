@@ -43,9 +43,9 @@ public class UploadController {
         //服务器保存的文件名
         String savedFileName=savedFilePath+uploadFileName+"."+uploadFileSuffix;
 
-        uploadFileService.saveFile(multipartFile,savedFileName);
-
         uploadFileService.checkFileExists(uploadFileName);
+
+        uploadFileService.saveFile(multipartFile,savedFileName);
 
         uploadFileService.saveExcelToMongo(savedFileName,uploadFileName);
     }

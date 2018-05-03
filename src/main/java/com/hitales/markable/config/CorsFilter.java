@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -18,8 +17,7 @@ public class CorsFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-            throws IOException, ServletException {
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
 
@@ -30,9 +28,9 @@ public class CorsFilter implements Filter {
         response.setHeader("Access-Control-Expose-Headers", "X-Requested-With, X-Auth-Token, Content-Type, X-TOTAL-COUNT");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Vary","Origin");
-        if (!"OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            chain.doFilter(req, res);
-        }
+//        if (!"OPTIONS".equalsIgnoreCase(request.getMethod())) {
+////            chain.doFilter(req, res);
+////        }
     }
 
     @Override
