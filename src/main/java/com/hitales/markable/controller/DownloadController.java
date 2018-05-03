@@ -2,6 +2,7 @@ package com.hitales.markable.controller;
 
 import com.hitales.markable.model.ColumnAttr;
 import com.hitales.markable.repository.ColumnAttrRepository;
+import com.hitales.markable.service.DownloadService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 
 @RestController
@@ -30,22 +32,11 @@ import java.util.Collections;
 public class DownloadController {
 
     @Autowired
-    private ColumnAttrRepository columnAttrRepository;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    private DownloadService downloadService;
 
     @GetMapping("")
-    public ResponseEntity<Resource> download(@RequestParam("filename") String filename){
-
-        String filePath="/files";
-
-        File file = FileUtils.getFile(filePath);
-        FileSystemResource fileSystemResource = new FileSystemResource(file);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.put("Content-disposition", Collections.singletonList(String
-                .format("attachment; filename=%s.xlsx", filename)));
-        return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
+    public ResponseEntity<Resource> download(@RequestParam("filename") String filename) throws IOException {
+        log.info("dpwnload start");
+        return downloadService.download(filename);
     }
 }
