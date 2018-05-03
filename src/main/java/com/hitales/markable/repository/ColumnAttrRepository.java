@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ColumnAttrRepository extends MongoRepository<ColumnAttr, String> {
-    List<ColumnAttr> findByFileName(String fileName);
+    ColumnAttr findByFileName(String fileName);
 }

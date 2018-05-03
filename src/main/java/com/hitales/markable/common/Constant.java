@@ -11,4 +11,7 @@ public class Constant {
     public static final String MUTI_INPUT_SPLIT_CHAR = ",";
 
     public static final String USER_INPUT_SPLIT_CHAR = "，";
+
+    public static final Integer MULTI_TYPE = 3;
+
 }
