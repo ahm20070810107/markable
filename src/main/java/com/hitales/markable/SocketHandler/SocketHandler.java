@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.hitales.markable.model.FileData;
 import com.hitales.markable.util.CommonTools;
+import com.hitales.markable.util.ExcelTools;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -52,19 +53,24 @@ public class SocketHandler implements WebSocketHandler{
     public void handleMessage(WebSocketSession arg0, WebSocketMessage<?> arg1) {
         // TODO Auto-generated method stub
         //log.info(arg0.getAttributes().get("user")+"的message："+arg1.getPayload());
-        Document document = (Document) arg1.getPayload();
-        if(document != null) {
-            FileData fileData = new FileData();
-            fileData.setId(CommonTools.getJSonValue(document,"id"));
-            fileData.setFileName(CommonTools.getJSonValue(document,"fileName"));
-            document.remove("id");
-            document.remove("fileName");
-            Map<String,Object> mapValues= new HashMap<>();
-            for(Document.Entry<String,Object> doc :document.entrySet()){
-                mapValues.put(doc.getKey(),doc.getValue());
+        Document document ;
+        try {
+            document = (Document) arg1.getPayload();
+            if (document != null) {
+                FileData fileData = new FileData();
+                fileData.setId(CommonTools.getJSonValue(document, "id"));
+                fileData.setFileName(CommonTools.getJSonValue(document, "fileName"));
+                document.remove("id");
+                document.remove("fileName");
+                Map<String, Object> mapValues = new HashMap<>();
+                for (Document.Entry<String, Object> doc : document.entrySet()) {
+                    mapValues.put(doc.getKey(), doc.getValue());
+                }
+                fileData.setDatas(mapValues);
+                mongoTemplate.save(fileData, "fileData");
             }
-            fileData.setDatas(mapValues);
-            mongoTemplate.save(fileData,"fileData");
+        }catch (Exception e){
+            log.info(arg1.getPayload().toString());
         }
     }
 
