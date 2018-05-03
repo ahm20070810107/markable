@@ -6,6 +6,7 @@ import com.hitales.markable.model.FileNameList;
 import com.hitales.markable.repository.ColumnAttrRepository;
 import com.hitales.markable.repository.FileDataRepository;
 import com.hitales.markable.repository.FileNameListRepository;
+import com.hitales.markable.response.ColumnAttrItemView;
 import com.hitales.markable.response.QueryFileListRes;
 import com.hitales.markable.response.QueryListRes;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,23 @@ public class QueryService {
         QueryListRes queryListRes = new QueryListRes();
         ColumnAttr columnAttr = columnAttrRepository.findByFileName(fileName);
         if(columnAttr!=null){
-            queryListRes.setTitles(columnAttr.getColumnList());
+            List<ColumnAttrItemView> titles = new ArrayList<>();
+            if(columnAttr.getColumnList()!=null){
+                columnAttr.getColumnList().forEach(columnAttrItem -> {
+                    ColumnAttrItemView columnAttrItemView = new ColumnAttrItemView();
+                    titles.add(columnAttrItemView);
+                    columnAttrItemView.setName(columnAttrItem.getName());
+                    columnAttrItemView.setType(columnAttrItem.getType());
+                    Map<Object,Object> map = new HashMap<>();
+                    columnAttrItemView.setOptions(map);
+                    columnAttrItem.getOptions().forEach(option ->{
+                        map.put(option,option);
+                    });
+
+                });
+            }
+
+            queryListRes.setTitles(titles);
             PageRequest pageRequest = PageRequest.of(page,pageSize);
             Page<FileData> fileDataPage = fileDataRepository.findByFileName(fileName,pageRequest);
             if(fileDataPage.hasContent()){

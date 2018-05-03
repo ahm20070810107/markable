@@ -10,7 +10,7 @@ import java.util.Map;
 public class QueryListRes {
     private int total;
 
-    private List<ColumnAttrItem> titles;
+    private List<ColumnAttrItemView> titles;
 
     private List<Map<String,Object>> list;
 }

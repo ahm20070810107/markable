@@ -1,5 +1,6 @@
 package com.hitales.markable.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hitales.markable.common.Constant;
 import com.hitales.markable.model.ColumnAttr;
 import com.hitales.markable.model.FileData;
@@ -28,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,7 +45,7 @@ public class DownloadService {
 
     public ResponseEntity<Resource> download(String filename) throws IOException {
 
-        String filePath = "/files/"+filename;
+        String filePath = filename+".xlsx";
         // 声明一个工作薄
         XSSFWorkbook workBook = new XSSFWorkbook();
         // 生成一个表格
@@ -54,36 +56,37 @@ public class DownloadService {
         if (columnAttr != null) {
             int colunmCount = columnAttr.getColumnList().size();
             String arrayColumnName = null;
+            Map<String,Integer> nameIndex = new HashMap<>();
             for (int i = 0; i < colunmCount; i++) {
                 titleRow.createCell(i).setCellValue(columnAttr.getColumnList().get(i).getName());
+                nameIndex.put(columnAttr.getColumnList().get(i).getName(),i);
                 if (columnAttr.getColumnList().get(i).getType() == Constant.MULTI_TYPE) {
                     arrayColumnName = columnAttr.getColumnList().get(i).getName();
                 }
             }
             Query query = getQuery(filename);
-            MongoCursor<FileData> iteratorCursor = mongoTemplate.getCollection("fileData").find(Document.parse(query.getQueryObject().toJson()), FileData.class).iterator();
+            MongoCursor<Document> iteratorCursor = mongoTemplate.getCollection("fileData").find(Document.parse(query.getQueryObject().toJson())).iterator();
             int i = 1;
             while (iteratorCursor.hasNext()) {
-                FileData fileData = iteratorCursor.next();
+                Document fileDataDoc = iteratorCursor.next();
+                fileDataDoc.remove("_id");
+                ObjectMapper objectMapper = new ObjectMapper();
+                FileData fileData  = objectMapper.readValue(fileDataDoc.toJson(),
+                        FileData.class);
                 Map<String, Object> datas = fileData.getDatas();
                 if (datas != null) {
                     XSSFRow row = sheet.createRow(i++);
                     Set<String> keySet = datas.keySet();
                     if (keySet != null) {
-                        int[] index=new int[]{0};
                         final String multi_column_name = arrayColumnName;
                         keySet.forEach(key -> {
-                            if(index[0]<colunmCount){
-                                if(multi_column_name!=null){
-                                    String multiVale = datas.get(key).toString().toString().replaceFirst("\\[","").replace("]","");
-                                    row.createCell(index[0]).setCellValue(multiVale);
-                                }
-                                else{
-                                    row.createCell(index[0]).setCellValue(datas.get(key).toString());
-                                }
-
+                            if(multi_column_name!=null&&multi_column_name.equals(key)){
+                                String multiVale = datas.get(key).toString().toString().replaceFirst("\\[","").replace("]","");
+                                row.createCell(nameIndex.get(key)).setCellValue(multiVale);
                             }
-                            index[0]++;
+                            else{
+                                row.createCell(nameIndex.get(key)).setCellValue(datas.get(key).toString());
+                            }
                         });
                     }
                 }
@@ -100,12 +103,12 @@ public class DownloadService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.put("Content-disposition", Collections.singletonList(String
-                .format("attachment; filename=%s.xlsx", filename)));
+                        .format("attachment; filename=%s.xlsx", new String(filename.getBytes("UTF-8"),"iso-8859-1"))));
         return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
     }
 
     private Query getQuery(String fileName) {
-        Query query = new Query(Criteria.where("filaName").is(fileName));
+        Query query = new Query(Criteria.where("fileName").is(fileName));
         return query;
     }
 }

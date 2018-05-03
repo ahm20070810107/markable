@@ -2,6 +2,7 @@ package com.hitales.markable.model;
 
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -10,5 +11,5 @@ public class ColumnAttrItem {
 
     private Integer type;
 
-    private Map<Object,Object> options;
+    private List<String> options;
 }

@@ -55,13 +55,13 @@ public class SocketHandler implements WebSocketHandler{
         //log.info(arg0.getAttributes().get("user")+"的message："+arg1.getPayload());
         Document document ;
         try {
-            document = (Document) arg1.getPayload();
+            document = Document.parse(arg1.getPayload().toString());
             if (document != null) {
                 FileData fileData = new FileData();
                 fileData.setId(CommonTools.getJSonValue(document, "id"));
-                fileData.setFileName(CommonTools.getJSonValue(document, "fileName"));
+                fileData.setFileName(CommonTools.getJSonValue(document, "filename"));
                 document.remove("id");
-                document.remove("fileName");
+                document.remove("filename");
                 Map<String, Object> mapValues = new HashMap<>();
                 for (Document.Entry<String, Object> doc : document.entrySet()) {
                     mapValues.put(doc.getKey(), doc.getValue());

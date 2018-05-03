@@ -97,7 +97,7 @@ public class UploadFileService {
         Set<String> setMultiColumn = new HashSet<>();    //存多选的列名
         saveColumnData(setMultiColumn,fileName,row0,row1,startNum,endNum);
 
-        int count=1;
+        int count=0;
         List<Document> listDoc= new ArrayList<>();
         while (rows.hasNext()) {
             count++;
