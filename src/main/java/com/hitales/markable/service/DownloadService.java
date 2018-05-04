@@ -101,8 +101,8 @@ public class DownloadService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         Date now = new Date();
-        SimpleDateFormat sf = new SimpleDateFormat("yyyy_MM_dd hh:MM");
-        filename=filename+"-"+sf.format(now).replaceAll(":","").replace(" ","");
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+        filename=filename+"_"+sf.format(now).replaceAll(":","");
         headers.put("Content-disposition", Collections.singletonList(String
                         .format("attachment; filename=%s.xlsx", new String(filename.getBytes("UTF-8"),"iso-8859-1"))));
         return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
