@@ -91,7 +91,7 @@ public class UploadFileService {
         Row row0 = rows.next();
 
         Row row1 = rows.next();
-        int startNum = row1.getFirstCellNum() + 1;//第一列不使用
+        int startNum = row1.getFirstCellNum();//第一列不使用
         int endNum = row1.getLastCellNum();
 
         Set<String> setMultiColumn = new HashSet<>();    //存多选的列名
