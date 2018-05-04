@@ -28,10 +28,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -102,6 +100,9 @@ public class DownloadService {
         FileSystemResource fileSystemResource = new FileSystemResource(file);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        Date now = new Date();
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy_MM_dd hh:MM:ss");
+        filename=filename+sf.format(now).replaceAll(":","").replace(" ","");
         headers.put("Content-disposition", Collections.singletonList(String
                         .format("attachment; filename=%s.xlsx", new String(filename.getBytes("UTF-8"),"iso-8859-1"))));
         return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
