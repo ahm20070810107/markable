@@ -16,6 +16,7 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
  * @author huangming
  *
  */
+
 public class WebSocketInterceptor implements HandshakeInterceptor{
 
     @Override
