@@ -22,7 +22,7 @@ public class DeleteController {
     @DeleteMapping(value = "/{fileName}")
     public String deleteFile(@PathVariable String fileName){
 
-        deleteService.deleteFileData(fileName);
-        return String.format("Delete file Data %s OK!",fileName);
+        long count=deleteService.deleteFileData(fileName);
+        return String.format("Delete file Data %s OK!,数据条数%d",fileName,count);
     }
 }

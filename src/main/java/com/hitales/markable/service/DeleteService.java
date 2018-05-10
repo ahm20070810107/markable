@@ -1,6 +1,7 @@
 package com.hitales.markable.service;
 
 import com.hitales.markable.Exception.BadRequestException;
+import com.mongodb.client.result.DeleteResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -22,13 +23,14 @@ public class DeleteService {
 
     @Autowired
     private MongoTemplate mongoTemplate;
-    public void deleteFileData(String fileName){
+    public long deleteFileData(String fileName){
         if(fileName== null || fileName.length() < 1){
             throw new BadRequestException("fileName不能为空！");
         }
         Query query= new Query(Criteria.where("fileName").is(fileName));
         mongoTemplate.remove(query,"columnAttr");
-        mongoTemplate.remove(query,"fileData");
         mongoTemplate.remove(query,"fileNameList");
+        DeleteResult deleteResult=mongoTemplate.remove(query,"fileData");
+        return deleteResult.getDeletedCount();
     }
 }
